@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:5.7
+    container_name: mysql_db_new
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: newwebdb  # เปลี่ยนชื่อฐานข้อมูลที่นี่
+    ports:
+      - "8832:3306"  # ใช้พอร์ตใหม่ที่ไม่ซ้ำกับโปรเจคอื่น
+    volumes:
+      - mysql_data_new:/var/lib/mysql  # ใช้ volume ใหม่
+    networks:
+      - weblab820  # ใช้ network เดิม หรือจะสร้างใหม่ก็ได้
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin_new
+    environment:
+      PMA_HOST: mysql_db_new  # ใช้ชื่อ container ของ db ใหม่
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8833:80"  # ใช้พอร์ตใหม่ที่ไม่ซ้ำกับโปรเจคอื่น
+    depends_on:
+      - db
+    networks:
+      - weblab820  # ใช้ network เดิม หรือจะสร้างใหม่ก็ได้
+    restart: always
+
+networks:
+  weblab820:  # ใช้ network เดิม หรือสร้างใหม่ก็ได้
+    driver: bridge
+
+volumes:
+  mysql_data_new:
+    driver: local  # ใช้ volume ใหม่เพื่อไม่ให้ข้อมูลชนกับโปรเจคเดิม
+
+#localhost:8833

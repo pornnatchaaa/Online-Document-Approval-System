@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Document Approval System</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Register Form (Initially visible) -->
+    <div id="registerForm" class="form-container">
+        <h1>Register</h1>
+        <form id="registerFormData">
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <select id="role" required>
+                    <option value="" disabled selected>Select Position</option>
+                    <option value="requester">Requester</option>
+                    <option value="approver">Approver</option>
+                </select>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+        <p>Already have an account? <a href="javascript:void(0);" onclick="showLoginForm()">Login here</a></p>
+    </div>
+
+    <!-- Login Form (Initially hidden) -->
+    <div id="loginForm" class="form-container hidden">
+        <h1>Login</h1>
+        <form id="loginFormData">
+            <div class="form-group">
+                <input type="text" id="loginUsername" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="javascript:void(0);" onclick="showRegisterForm()">Register here</a></p>
+    </div>
+
+    <script>
+        // Switch to Login Form
+        function showLoginForm() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        // Switch to Register Form
+        function showRegisterForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        // Handle Register Form submission
+        document.getElementById('registerFormData').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+    
+            try {
+                const response = await axios.post('http://localhost:8000/api/register', {
+                    username, password, email, role
+                });
+    
+                if (response.data.success) {
+                    alert('User registered successfully');
+                    showLoginForm(); // Switch to Login Form after successful registration
+                } else {
+                    alert('Registration failed: ' + (response.data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration error: ' + error.message);
+            }
+        });
+
+        // Handle Login Form submission
+        document.getElementById('loginFormData').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+    
+            try {
+                const response = await axios.post('http://localhost:8000/api/login', {
+                    username, password
+                });
+    
+                if (response.data.success) {
+                    alert('Login successful');
+                    window.location.href = 'dashboard.html'; // Redirect to dashboard after successful login
+                } else {
+                    alert('Login failed: ' + (response.data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login error: ' + error.message);
+            }
+        });
+        document.getElementById('loginFormData').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const response = await axios.post('http://localhost:8000/api/login', {
+            username, password
+        });
+
+        if (response.data.success) {
+            // รับค่าบทบาทจากการ login
+            console.log("Response from API: ", response.data);  // แสดงข้อมูลที่ได้รับจาก API
+            const role = response.data.role;  // รับค่าบทบาทจากการ login
+            localStorage.setItem('token', response.data.token);  // เก็บ token สำหรับการใช้ในอนาคต
+            localStorage.setItem('userRole', role);
+            localStorage.setItem('userId', response.data.userId);
+            // เก็บ role
+            // Redirect ไปยังหน้าที่เกี่ยวข้องตาม role
+            if (role === 'requester') {
+                window.location.href = 'requester-dashboard.html';  // เปลี่ยนไปหน้า requester
+            } else if (role === 'approver') {
+                window.location.href = 'approver-dashboard.html';  // เปลี่ยนไปหน้า approver
+            } else {
+                window.location.href = 'dashboard.html';  // หน้าเริ่มต้นสำหรับ role อื่น ๆ
+            }
+        } else {
+            alert('Login failed: ' + (response.data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Login error: ' + error.message);
+    }
+});
+
+
+
+    </script>
+</body>
+</html>
