@@ -1,35 +1,39 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
+const multer = require('multer');  // ใช้จัดการไฟล์อัปโหลด
+const path = require('path');  // สำหรับจัดการ path ไฟล์
 
 const app = express();
 const port = 8000;  // ใช้พอร์ต 8000 สำหรับ Express
-const upload = multer({
-    dest: 'uploads/', 
-    limits: { fileSize: 10 * 1024 * 1024 }  // ขนาดไฟล์สูงสุด 10MB
-});
 
-/*const title = document.getElementById('title').value;
-const createdBy = document.getElementById('created_by').value;
-
-formData.append('file', file);
-formData.append('title', title);
-formData.append('created_by', createdBy);*/
-
-
+// ตั้งค่า static file (frontend, ไฟล์ที่อัปโหลด)
 app.use(express.static(path.join(__dirname, '../public')));  // เสิร์ฟไฟล์จาก public
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // ให้เข้าถึงไฟล์อัปโหลดผ่าน /uploads
 
+// กำหนดการตั้งค่าเก็บไฟล์โดยใช้ multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');  // บอกให้เก็บไฟล์ในโฟลเดอร์ uploads
+    },
+    filename: (req, file, cb) => {
+        const timestamp = Date.now(); // ใช้ timestamp กันชื่อซ้ำ
+        const sanitizedOriginal = file.originalname.replace(/\s+/g, '-'); // แก้ชื่อไฟล์ลบช่องว่าง
+        cb(null, `${timestamp}-${sanitizedOriginal}`);  // ตั้งชื่อไฟล์ใหม่
+    }
+});
+const upload = multer({ storage });  // สร้าง multer ด้วย config ที่กำหนดไว้
+
+// เปิดใช้งาน CORS เพื่อให้ frontend เรียก API ข้าม origin ได้
 app.use(cors({
     origin: '*',  // ยอมรับทุก origin
     methods: 'GET,POST,PUT,DELETE', // กำหนด method ที่อนุญาต
     allowedHeaders: 'Content-Type, Authorization'  // กำหนด headers ที่อนุญาต
 }));
 
-app.use(express.json());
+app.use(express.json()); // ใช้ middleware ให้ express อ่าน request body เป็น JSON ได้
 
-let db;
+let db; // ตัวแปรสำหรับเก็บ connection กับฐานข้อมูล
 
 // เชื่อมต่อกับฐานข้อมูล MySQL ที่ใช้พอร์ต 8832
 const initMySQL = async () => {
@@ -44,18 +48,17 @@ const initMySQL = async () => {
         console.log("Connected to MySQL successfully");
     } catch (error) {
         console.error("Database connection error:", error);
-        process.exit(1); // Exit if DB connection fails
+        process.exit(1); // ออกจากโปรแกรมทันทีถ้าเชื่อมไม่ได้
     }
 };
 
 // API สำหรับการสมัครสมาชิก (register)
 app.post('/api/register', async (req, res) => {
-    const { username, password, email, role } = req.body;
-
+    const { username, password, email, role } = req.body; // รับข้อมูลจาก body
     if (!username || !password || !email || !role) {
         return res.status(400).json({
             success: false,
-            error: 'Please provide all required fields'
+            error: 'Please provide all required fields' 
         });
     }
 
@@ -63,13 +66,13 @@ app.post('/api/register', async (req, res) => {
         // ใช้รหัสผ่านแบบธรรมดา (ไม่เข้ารหัส)
         const result = await db.query(
             'INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
-            [username, password, email, role]  // เก็บรหัสผ่านแบบธรรมดา
+            [username, password, email, role]  // เก็บรหัสผ่านแบบธรรมดา // ใช้ parameterized query ป้องกัน SQL injection
         );
 
         res.json({
             success: true,
             message: 'User registered successfully',
-            userId: result.insertId
+            userId: result.insertId // ส่ง user_id กลับ
         });
 
     } catch (error) {
@@ -111,7 +114,7 @@ app.post('/api/login', async (req, res) => {
             success: true,
             message: 'Login successful',
             role: role ,
-            userId: user.user_id  // ส่ง role กลับไปใน response
+            userId: user.user_id  // ส่งข้อมูลผู้ใช้กลับ
         });
 
     } catch (error) {
@@ -124,28 +127,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// API ที่ให้ Requester ส่งเอกสารไปยัง Approver
-/*app.post('/api/upload', async (req, res) => {
-    const { title, approverId, filePath, requesterId } = req.body;
-
-    if (!title || !approverId || !filePath || !requesterId) {
-        return res.status(400).json({ success: false, error: 'Please provide all required fields.' });
-    }
-
-    try {
-        const result = await db.query(
-            'INSERT INTO documents (title, file_path, requester_id, approver_id, status) VALUES (?, ?, ?, ?, ?)',
-            [title, filePath, requesterId, approverId, 'pending']
-        );
-
-        res.json({ success: true, message: 'Document uploaded successfully', documentId: result.insertId });
-    } catch (error) {
-        console.error('Error uploading document:', error);
-        res.status(500).json({ success: false, error: 'Internal server error' });
-    }
-});*/
-
-
+// API สำหรับดึงเอกสารที่อยู่ในสถานะ pending (รออนุมัติ) จาก approverId
 app.get('/api/pending-documents/:approverId', async (req, res) => {
     const { approverId } = req.params;
 
@@ -165,54 +147,7 @@ app.get('/api/pending-documents/:approverId', async (req, res) => {
     }
 });
 
-
-
-/*
-app.post('/api/update-document-status', async (req, res) => {
-    const { documentId, status } = req.body;
-
-    if (!documentId || !status) {
-        return res.status(400).json({ success: false, error: 'Please provide document ID and status.' });
-    }
-
-    try {
-        const result = await db.query(
-            'UPDATE documents SET status = ? WHERE id = ?',
-            [status, documentId]
-        );
-
-        if (result.affectedRows > 0) {
-            res.json({ success: true, message: `Document ${status}` });
-        } else {
-            res.status(404).json({ success: false, error: 'Document not found.' });
-        }
-    } catch (error) {
-        console.error('Error updating document status:', error);
-        res.status(500).json({ success: false, error: 'Internal server error' });
-    }
-});*/
-
-/*app.post('/api/upload', upload.single('file'), async (req, res) => {
-    const { title, requesterId, description } = req.body;
-    const filePath = req.file ? req.file.path : null;
-
-    if (!title || !filePath || !requesterId) {
-        return res.status(400).json({ success: false, error: 'Please provide all required fields.' });
-    }
-
-    try {
-        const result = await db.query(
-            'INSERT INTO documents (title , description, file_path, created_by, status) VALUES (?, ?, ?, ?, ?)',
-            [title, description, filePath, requesterId, 'pending']
-        );
-
-        res.json({ success: true, message: 'Document uploaded successfully', documentId: result.insertId });
-    } catch (error) {
-        console.error('Error uploading document:', error.message);
-        res.status(500).json({ success: false, error: 'Internal server error' });
-    }
-});*/
-
+// API สำหรับอัปโหลดเอกสาร
 app.post('/api/upload', upload.single('file'), async (req, res) => {
     const { title, requesterId, approverId, description } = req.body;
     const filePath = req.file ? req.file.path : null;
@@ -234,19 +169,16 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     }
 });
 
-// API สำหรับ Approver อนุมัติหรือปฏิเสธเอกสาร
-
-
-
+// API สำหรับดึงเอกสารที่มีสถานะเป็น pending
 app.get('/api/pending-docs', async (req, res) => {
     const { approverId } = req.query;
 
     try {
         const [rows] = await db.query(
-            `SELECT d.document_id, d.title, d.file_path, u.username AS requester 
+            `SELECT d.document_id, d.title, d.description, d.file_path, u.username AS requester 
              FROM documents d 
-             JOIN users u ON d.created_by = u.user_id 
-             WHERE d.approver_id = ? AND d.status = 'pending'`,
+            JOIN users u ON d.created_by = u.user_id 
+            WHERE d.approver_id = ? AND d.status = 'pending'`,
             [approverId]
         );
         res.json(rows);
@@ -255,8 +187,9 @@ app.get('/api/pending-docs', async (req, res) => {
     }
 });
 
+// API สำหรับอัปเดตสถานะเอกสาร
 app.post('/api/update-status', async (req, res) => {
-    const { documentId, status } = req.body;
+    const { documentId, status, reason } = req.body;
 
     if (!['approved', 'rejected'].includes(status)) {
         return res.status(400).json({ error: 'Invalid status' });
@@ -264,9 +197,9 @@ app.post('/api/update-status', async (req, res) => {
 
     try {
         const [result] = await db.query(
-            'UPDATE documents SET status = ? WHERE document_id = ?',
-            [status, documentId]
-        );
+            'UPDATE documents SET status = ?, reason = ? WHERE document_id = ?',
+            [status, reason, documentId]
+          );          
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Document not found' });
@@ -280,22 +213,7 @@ app.post('/api/update-status', async (req, res) => {
 });
 
 
-/*app.post('/api/update-status', async (req, res) => {
-    const { documentId, status } = req.body;
-
-    if (!['approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'Invalid status' });
-    }
-
-    try {
-        await db.query('UPDATE documents SET status = ? WHERE document_id = ?', [status, documentId]);
-        res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to update status' });
-    }
-});*/
-
-// ดึงรายชื่อ Approver ทั้งหมด
+// API ดึงรายชื่อ Approver ทั้งหมด
 app.get('/api/approvers', async (req, res) => {
     try {
         const [users] = await db.query("SELECT user_id AS id, username FROM users WHERE role = 'approver'");
@@ -306,32 +224,16 @@ app.get('/api/approvers', async (req, res) => {
     }
 });
 
-app.post('/api/documents/:documentId/decision', async (req, res) => {
-    const documentId = req.params.documentId;
-    const { decision } = req.body;
-
-    if (!['approved', 'rejected'].includes(decision)) {
-        return res.status(400).json({ error: 'Invalid decision' });
-    }
-
-    try {
-        await db.query('UPDATE documents SET status = ? WHERE document_id = ?', [decision, documentId]);
-        res.json({ message: `Document ${decision}` });
-    } catch (error) {
-        console.error('Error updating status:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
+// API: ดึงเอกสารที่สร้างโดย requester  เอกสารที่ requester เคยส่ง
 app.get('/api/requester-documents/:requesterId', async (req, res) => {
     const { requesterId } = req.params;
 
     try {
         const [docs] = await db.query(
-            `SELECT d.document_id, d.title, d.status, d.file_path, u.username AS approver
-             FROM documents d 
-             JOIN users u ON d.approver_id = u.user_id 
-             WHERE d.created_by = ?`,
+            `SELECT d.document_id, d.title, d.description, d.status, d.file_path, d.created_at,d.reason ,u.username AS approver
+FROM documents d 
+JOIN users u ON d.approver_id = u.user_id 
+WHERE d.created_by = ?`,
             [requesterId]
         );
 
@@ -343,6 +245,99 @@ app.get('/api/requester-documents/:requesterId', async (req, res) => {
 });
 
 
+// API: ดึงเอกสารที่ไม่ใช่ pending คือเคยอนุมัติหรือปฏิเสธแล้ว
+app.get('/api/history-docs/:approverId', async (req, res) => {
+    const { approverId } = req.params;
+
+    try {
+        const [rows] = await db.query(
+            `SELECT d.document_id, d.title, d.description, d.status, d.file_path, d.created_at, d.reason, u.username AS requester
+             FROM documents d 
+             JOIN users u ON d.created_by = u.user_id 
+             WHERE d.approver_id = ? AND d.status != 'pending' 
+             ORDER BY d.created_at DESC`,
+            [approverId]
+          );
+
+        res.json({ success: true, documents: rows });
+    } catch (error) {
+        console.error("Error fetching history:", error);
+        res.status(500).json({ success: false, error: 'Failed to fetch history documents' });
+    }
+});
+
+
+// API แก้ไขเอกสาร (เฉพาะสถานะ pending เท่านั้น)
+app.put('/api/documents/:id', upload.single('file'), async (req, res) => {
+    const docId = req.params.id;
+    const { title, description } = req.body;
+    const filePath = req.file ? req.file.path : null;
+
+    try {
+        const [docs] = await db.query('SELECT * FROM documents WHERE document_id = ?', [docId]);
+
+        if (docs.length === 0) {
+            return res.status(404).json({ success: false, error: 'Document not found' });
+        }
+
+        const doc = docs[0];
+        if (doc.status !== 'pending') {
+            return res.status(400).json({ success: false, error: 'Cannot edit approved/rejected document' });
+        }
+
+        // สร้าง SQL แบบ dynamic ตามว่าอัปเดต file ใหม่มั้ย
+        let sql = 'UPDATE documents SET title = ?, description = ?';
+        const params = [title, description];
+
+        if (filePath) {
+            sql += ', file_path = ?';
+            params.push(filePath);
+        }
+
+        sql += ' WHERE document_id = ?';
+        params.push(docId);
+
+        await db.query(sql, params);
+
+        res.json({ success: true, message: 'Document updated successfully' });
+    } catch (error) {
+        console.error('Error updating document:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// API ลบเอกสาร
+ app.delete('/api/documents/:id', async (req, res) => {
+    const documentId = req.params.id;
+    try {
+      await db.query('DELETE FROM documents WHERE document_id = ?', [documentId]);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Failed to delete document' });
+    }
+  });
+
+// API สำหรับดึงข้อมูลเอกสารตาม ID
+app.get('/api/documents/:id', async (req, res) => {
+    const docId = req.params.id;
+    
+    try {
+      const [docs] = await db.query(
+        'SELECT * FROM documents WHERE document_id = ?',
+        [docId]
+      );
+      
+      if (docs.length === 0) {
+        return res.status(404).json({ success: false, error: 'Document not found' });
+      }
+      
+      res.json({ success: true, document: docs[0] });
+    } catch (error) {
+      console.error('Error fetching document:', error);
+      res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+  });
+  
 
 app.listen(port, async () => {
     await initMySQL();

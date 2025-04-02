@@ -1,0 +1,113 @@
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+    z-index: -1;
+    object-fit: cover;
+    opacity: 0.6; /* ปรับความโปร่งใสเพื่อให้มองเห็นตัวอักษรชัด */
+  }
+  body, html {
+    height: 100%;
+    margin: 0;
+  }
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #eef5fb;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  }
+  
+  .auth-container {
+    max-width: 500px;
+    margin: 60px auto;
+    //background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  h1 {
+    font-size: 24px;
+    margin-bottom: 0px;
+    color: #333;
+  }
+  h2 {
+    margin-top: 8px;
+    margin-bottom: 20px;
+  }
+
+  .main-title {
+    color: #1a237e; /* navy blue */
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .sub-title {
+    color: #333;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 25px;
+  }
+  
+  .form-box h2 {
+    color:#7886C7;
+    margin-bottom: 15px;
+  }
+  
+  input, select {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box; /* ✅ ป้องกันชนขอบ */
+  }
+  
+  button {
+    width: 100%;
+    padding: 12px;
+    background-color: #8AB2A6;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-top: 8px;
+  }
+  
+  button:hover {
+    background-color: #ACD3A8;
+  }
+  
+  .form-toggle {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  
+  .form-toggle a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .form-toggle a:hover {
+    text-decoration: underline;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  

@@ -1,33 +1,249 @@
-/* Styles for Requester Dashboard */
-.dashboard-container {
-    width: 80%;
-    max-width: 900px;
-    margin: 30px auto;
-    background-color: white;
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  z-index: -1;
+  object-fit: cover;
+  opacity: 0.6; /* ปรับความโปร่งใสเพื่อให้มองเห็นตัวอักษรชัด */
+}
+body, html {
+  height: 100%;
+  margin: 0;
+}
+/*@font-face {
+  font-family: 'Noto_Sans';
+  src: url('./Noto_Sans/NotoSans-VariableFont_wdth,wght.ttf')
+}*/
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    //background: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  /* Top bar */
+.top-bar {
+  position: fixed;
+  width: 100%;
+  padding: 10px 30px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  right: 40px;
+}
+
+/* Profile Picture */
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+
+/* Dropdown */
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  flex-direction: column;
+  min-width: 150px;
+  z-index: 999;
+}
+
+.dropdown-menu a {
+  padding: 12px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+  
+  /* สำหรับจัด layout ซ้าย-ขวา */
+.main-container {
+    //background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: space-between;
+    padding: 40px;
+    gap: 40px; /* ✅ เว้นช่องระหว่างซ้าย-ขวา */
+    
+  }
+
+  /* ซ้าย = ฟอร์ม */
+.left-section {
+    flex: 1;
     padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-family: 'Noto_Sans';
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    //max-height: 550px; 
+     /* ✅ ส่วนสำคัญสำหรับ scroll ในกรอบ */
+  max-height: 550px;      /* ความสูงกรอบ */
+  overflow-y: auto;       /* ให้เลื่อนเมื่อข้อมูลเยอะ */
+  scroll-behavior: smooth;
+  transition: all 0.3s ease;
+  }
+  
+  /* ขวา = เอกสารที่เคยส่ง */
+  .right-section {
+    flex: 1;
+    background-color: #eef5fb;
+    padding: 20px;
+    border-radius: 10px;
+     /* ✅ ส่วนสำคัญสำหรับ scroll ในกรอบ */
+  max-height: 550px;      /* ความสูงกรอบ */
+  overflow-y: auto;       /* ให้เลื่อนเมื่อข้อมูลเยอะ */
+  scroll-behavior: smooth;
+  transition: all 0.3s ease;
+  }
+
+  .left-section:hover,
+.right-section:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
-.dashboard-title {
-    color: #333;
+  
+  .dashboard-title {
     text-align: center;
-    font-size: 36px;
-    margin-bottom: 30px;
-}
-
-h2 {
-    color: #444;
-    font-size: 24px;
+    font-size: 2em;
+    color: #1a237e;
     margin-bottom: 20px;
-}
+  }
+  
+  .sub-title {
+    color: #7886C7;
+  }
+  form {
+    background: #fff;
+    //padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+  .form-group {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px; /* ✅ ให้ช่องกรอกแต่ละอันเว้นระยะห่าง */
+    padding: 20px; /* ✅ เพิ่ม padding รอบฟอร์ม ไม่ให้ชนขอบ */
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }  
+  
+  /* กล่อง input */
+  .form-group input,
+  .form-group select,
+  .form-group button {
+    width: 100%;
+    padding: 10px 15px; /* ✅ ทำให้มีระยะห่างในช่องกรอก */
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  form button {
+    width: 100%;
+    background-color: #8AB2A6;
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  form button:hover {
+    background-color: #45a049;
+  }
 
-.form-group {
+  /* ปุ่ม Submit */
+button[type="submit"] {
+    background-color: #8AB2A6;
+    color: white;
+    padding: 12px;
+    border: none;
+    width: 100%;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button[type="submit"]:hover {
+    background-color: #ACD3A8;
+  }
+  //ปุ่ม save หน้า Requester Dashboard
+  button[type="submit1"] {
+    background-color: #a5d6a7; /* เขียวนุ่ม */
+  color: #1b5e20;
+  }
+  button[type="submit1"]:hover {
+    background-color: #81c784;
+  }
+  
+  
+  /* กล่องแสดงผลเอกสารแต่ละอัน */
+  .status-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
     margin-bottom: 20px;
-    padding: 0 15px;
-}
-
+  }
+  
+  .status-header {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+  }
+  
+  .status-header.approved {
+    background-color: #e6f4ea;
+    color: #006400;
+  }
+  
+  .status-header.rejected {
+    background-color: #ffe6e6;
+    color: #c00;
+  }
+  
+  .status-header.pending {
+    background-color: #fff7e6;
+    color: #cc8400;
+  }
+  
+  .status-details {
+    padding: 15px 20px;
+    font-size: 14px;
+    background-color: transparent;
+  }
+  
+  .status-details a {
+    color: #3333cc;
+    text-decoration: none;
+  }
+  .status-details a:hover {
+    text-decoration: underline;
+  }
+  
 .form-group input[type="file"] {
     padding: 12px;
     border: 1px solid #ccc;
@@ -40,7 +256,7 @@ h2 {
 
 button {
     padding: 12px 20px;
-    background-color: #4CAF50;
+    background-color: #8AB2A6;
     color: white;
     border: none;
     border-radius: 8px;
@@ -50,10 +266,25 @@ button {
     font-size: 16px;
 }
 
-button:hover {
-    background-color: #45a049;
+
+//สีปุ่ม approve และ reject หน้า Approver Dashboard
+button.approve:hover {
+    background-color: lightgreen;
+}
+button.reject:hover {
+    background-color: lightpink;
 }
 
+button.approve {
+    background-color: #28a745; /* สีเขียวสำหรับปุ่มอนุมัติ */
+    color: white; /* สีตัวอักษรขาว */
+  }
+  
+  button.reject {
+    background-color: #dc3545; /* สีแดงสำหรับปุ่มปฏิเสธ */
+    color: white; /* สีตัวอักษรขาว */
+  }
+  
 .status {
     padding: 10px;
     background-color: #f1f1f1;
@@ -77,81 +308,305 @@ button:hover {
 .rejected {
     color: red;
 }
-/* Styles for Approver Dashboard */
-.dashboard-container {
-    width: 80%;
-    max-width: 900px;
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-family: 'Noto_Sans';
-    margin: 30px auto;
+.action-buttons {
+  display: flex;
+  gap: 12px; /* ระยะห่างระหว่างปุ่ม */
+  margin-top: 20px;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-h2 {
-    color: #444;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-.document-list {
-    margin-top: 20px;
-    list-style-type: none;
-    padding: 0;
-}
-
-.document-item {
-    background-color: #fafafa;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.document-item h3 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.document-item p {
-    color: #777;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.approve-btn, .reject-btn {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
+.approve-btn,
+.reject-btn {
+  flex: 1; /* แบ่งครึ่ง */
+  padding: 12px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .approve-btn {
-    background-color: #4CAF50;
-    color: white;
+  background-color: #a5d6a7; /* เขียวนุ่ม */
+  color: #1b5e20;
 }
 
 .approve-btn:hover {
-    background-color: #45a049;
+  background-color: #81c784;
 }
 
 .reject-btn {
-    background-color: #f44336;
-    color: white;
+  background-color: #ef9a9a; /* แดงนุ่ม */
+  color: #b71c1c;
 }
 
 .reject-btn:hover {
-    background-color: #e53935;
+  background-color: #e57373;
 }
+
+.main-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 20px 40px;
+  }
+  
+  .left-section1, .right-section1{
+    flex: 1;
+  }
+  //Approver Dashboard
+  /* ปรับขนาดให้เหมาะสม */
+  .left-section {
+    max-width: 55%;
+    max-height: 550px;      /* ความสูงกรอบ */
+  overflow-y: auto;       /* ให้เลื่อนเมื่อข้อมูลเยอะ */
+  scroll-behavior: smooth;
+  transition: all 0.3s ease;
+  }
+  .right-section {
+    max-width: 45%;
+  background-color: #f0f4f8; /* เทาอ่อน สะอาดตา */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  min-height: 550px; /* ✅ เพิ่มความสูงขั้นต่ำ */
+  max-height: 550px;      /* ความสูงกรอบ */
+  overflow-y: auto;       /* ให้เลื่อนเมื่อข้อมูลเยอะ */
+  scroll-behavior: smooth;
+  transition: all 0.3s ease;
+  }
+
+  .left-section:hover,
+.right-section:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+  
+
+
+
+/* accordion */
+.accordion-container {
+    margin-top: 20px;
+}
+
+.accordion-item {
+    margin-bottom: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.accordion-toggle {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    outline: none;
+    text-align: left;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 16px;
+}
+
+/* accordion content */
+.accordion-content {
+    padding: 12px 16px;
+    display: none;
+    background-color: #fafafa;
+    border-top: 1px solid #ccc;
+}
+
+.accordion-content {
+    background-color: #fdfdfd;
+    padding: 16px;
+    display: none;
+    border-top: 1px solid #ddd;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+
+.accordion-content strong {
+    font-weight: 600;
+    color: #111;
+}
+
+.accordion-content a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.accordion-content a:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+}
+
+/* approved style */
+.approved-toggle {
+    background-color: #e0f2f1; /* เขียวอ่อนแบบชัดกว่าเดิม */
+    border-left: 5px solid #26a69a;
+    color: #004d40; /* ตัวอักษรเข้ม */
+}
+.approved-status {
+    color: #388e3c;
+    font-weight: bold;
+}
+.approved-toggle:hover {
+    background-color: #b2dfdb;
+  }
+
+/* rejected style */
+.rejected-toggle {
+    background-color: #ffebee;
+    border-left: 5px solid #e57373;
+    color: #b71c1c; /* ตัวอักษรเข้ม */
+}
+
+.rejected-status {
+    color: #c62828;
+    font-weight: bold;
+}
+.rejected-toggle:hover {
+    background-color: #ffcdd2;
+  }
+
+/* 🔍 กล่องค้นหา */
+.search-box {
+  width: 95%;
+  padding: 10px 10px;
+  margin: 10px 0 20px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: 0.2s;
+}
+
+.search-box:focus {
+  outline: none;
+  border-color: #8AB2A6;
+  box-shadow: 0 0 5px rgba(138, 178, 166, 0.5);
+}
+
+.reject-reason-box {
+  width: 95%;
+  padding: 12px 14px;
+  margin: 12px 0;
+  font-size: 14px;
+  min-height: 70px;
+  resize: vertical;
+
+  border: 1px solid #ccc;
+  border-radius: 12px;
+
+  background-color: #f9f9f9;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  font-family: 'Segoe UI', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.reject-reason-box:focus {
+  outline: none;
+  border-color: #6ea8fe;
+  box-shadow: 0 0 0 3px rgba(110, 168, 254, 0.3);
+  background-color: #fff;
+}
+
+
+/* กล่อง Edit */
+.edit-box {
+  background-color: #F8E7F6;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  max-width: 480px;
+  margin: 20px auto;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.edit-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.edit-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a237e;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #A6AEBF;
+  text-align: center;
+}
+
+.edit-form {
+  padding: 10px 5px;
+}
+
+.form-group1 {
+  margin-bottom: 18px;
+  padding: 0;
+  box-shadow: none;
+}
+
+.edit-input {
+  width: 88%;
+  padding: 12px 15px;
+  font-size: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #8AB2A6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(138, 178, 166, 0.2);
+}
+
+.file-input {
+  width: 90%;
+  padding: 12px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.file-input:hover {
+  background-color: #f0f0f0;
+}
+
+.reject-btn,.approve-btn {
+  margin-top: 6px;
+}
+.hidden {
+  display: none;
+}
+
+
+
+  @media (max-width: 768px) {
+    .main-layout {
+      flex-direction: column;
+    }
+    .left-section{
+      max-width: 100%;
+    }
+    .right-section {
+        margin-left: 0;
+        margin-top: 20px;
+      }
+  }
+  
